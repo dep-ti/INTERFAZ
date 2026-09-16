@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asignación de técnicos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#eef0ee;
+    --tinta:#16241f;
+    --tinta-suave:#5b6a63;
+    --linea:#c9d1cc;
+    --campo:#0f5132;
+    --senal:#e0a300;
+    --pausa:#8a6d00;
+    --blanco:#fbfcfb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--papel);
+    color:var(--tinta);
+    font:400 16px/1.5 "Barlow", system-ui, sans-serif;
+  }
+  header{
+    background:var(--campo);
+    color:var(--blanco);
+    padding:1.5rem 1.75rem;
+  }
+  header h1{
+    font-family:"Barlow Semi Condensed", sans-serif;
+    font-weight:600;
+    font-size:1.9rem;
+    letter-spacing:.01em;
+    margin:0;
+  }
+  header p{margin:.25rem 0 0;color:#bfd7c9;font-size:.95rem}
+  main{
+    max-width:1180px;
+    margin:0 auto;
+    padding:1.75rem;
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:1.75rem;
+    align-items:start;
+  }
+  @media (max-width:880px){ main{grid-template-columns:1fr} }
+
+  section{
+    background:var(--blanco);
+    border:1px solid var(--linea);
+    padding:1.1rem 1.2rem 1.3rem;
+  }
+  h2{
+    font-family:"Barlow Semi Condensed", sans-serif;
+    font-size:1.15rem;
+    font-weight:600;
+    margin:0 0 .85rem;
+    padding-bottom:.5rem;
+    border-bottom:2px solid var(--campo);
+  }
+  form{display:grid;gap:.6rem}
+  form + h2{margin-top:1.6rem}
+  label{font-size:.82rem;color:var(--tinta-suave);display:block;margin-bottom:.15rem}
+  input,select{
+    width:100%;
+    font:inherit;
+    padding:.5rem .55rem;
+    border:1px solid var(--linea);
+    background:var(--blanco);
+    color:var(--tinta);
+    border-radius:2px;
+  }
+  input:focus,select:focus{outline:2px solid var(--campo);outline-offset:1px;border-color:var(--campo)}
+  button{
+    font:500 .95rem "Barlow",sans-serif;
+    padding:.55rem .9rem;
+    border:0;
+    border-radius:2px;
+    background:var(--campo);
+    color:var(--blanco);
+    cursor:pointer;
+  }
+  button:hover{background:#0b3d26}
+  button.secundario{background:transparent;color:var(--tinta-suave);border:1px solid var(--linea);padding:.3rem .5rem;font-size:.82rem}
+  button.secundario:hover{background:#e7ebe8;color:var(--tinta)}
+
+  .filtros{display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap}
+  .filtros a{
+    text-decoration:none;font-size:.88rem;padding:.3rem .7rem;
+    border:1px solid var(--linea);color:var(--tinta-suave);border-radius:2px;
+  }
+  .filtros a.activo{background:var(--campo);border-color:var(--campo);color:var(--blanco)}
+
+  table{width:100%;border-collapse:collapse;font-size:.93rem}
+  th{
+    text-align:left;font-family:"Barlow Semi Condensed",sans-serif;font-weight:600;
+    color:var(--tinta-suave);border-bottom:1px solid var(--linea);padding:.45rem .5rem;
+  }
+  td{padding:.6rem .5rem;border-bottom:1px solid #e3e7e4;vertical-align:top}
+  td small{display:block;color:var(--tinta-suave);font-size:.8rem}
+  .estado{display:inline-block;font-size:.8rem;padding:.12rem .5rem;border:1px solid}
+  .Activo{color:var(--campo);border-color:var(--campo)}
+  .En.pausa{color:var(--pausa);border-color:var(--senal)}
+  .Finalizado{color:var(--tinta-suave);border-color:var(--linea)}
+  .acciones{display:flex;gap:.35rem;flex-wrap:wrap}
+  .vacio{padding:2rem 0;color:var(--tinta-suave)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Asignación de técnicos</h1>
+  <p>Quién está en qué proyecto, desde cuándo y en qué estado.</p>
+</header>
+
+<main>
+  <div>
+    <section>
+      <h2>Registrar asignación</h2>
+      <form method="post" action="/asignaciones">
+        <div>
+          <label for="tecnico_id">Técnico</label>
+          <select id="tecnico_id" name="tecnico_id" required>
+            <option value="">Elegir técnico</option>
+            {% for t in tecnicos %}
+              <option value="{{ t.id }}">{{ t.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="proyecto_id">Proyecto</label>
+          <select id="proyecto_id" name="proyecto_id" required>
+            <option value="">Elegir proyecto</option>
+            {% for p in proyectos %}
+              <option value="{{ p.id }}">{{ p.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="rol">Rol en el proyecto</label>
+          <input id="rol" name="rol" placeholder="Instalación, soporte…">
+        </div>
+        <div>
+          <label for="fecha_inicio">Fecha de inicio</label>
+          <input id="fecha_inicio" name="fecha_inicio" type="date" value="{{ hoy }}">
+        </div>
+        <button type="submit">Guardar asignación</button>
+      </form>
+
+      <h2>Nuevo técnico</h2>
+      <form method="post" action="/tecnicos">
+        <div>
+          <label for="t_nombre">Nombre</label>
+          <input id="t_nombre" name="nombre" required>
+        </div>
+        <div>
+          <label for="t_esp">Especialidad</label>
+          <input id="t_esp" name="especialidad" placeholder="Eléctrico, redes…">
+        </div>
+        <button type="submit">Agregar técnico</button>
+      </form>
+
+      <h2>Nuevo proyecto</h2>
+      <form method="post" action="/proyectos">
+        <div>
+          <label for="p_nombre">Nombre</label>
+          <input id="p_nombre" name="nombre" required>
+        </div>
+        <div>
+          <label for="p_cliente">Cliente</label>
+          <input id="p_cliente" name="cliente">
+        </div>
+        <div>
+          <label for="p_ubi">Ubicación</label>
+          <input id="p_ubi" name="ubicacion">
+        </div>
+        <button type="submit">Agregar proyecto</button>
+      </form>
+    </section>
+  </div>
+
+  <section>
+    <h2>Asignaciones</h2>
+    <div class="filtros">
+      <a href="/?estado=todos" class="{{ 'activo' if filtro not in estados }}">Todas</a>
+      {% for e in estados %}
+        <a href="/?estado={{ e }}" class="{{ 'activo' if filtro == e }}">{{ e }}</a>
+      {% endfor %}
+    </div>
+
+    {% if asignaciones %}
+    <table>
+      <thead>
+        <tr>
+          <th>Técnico</th><th>Proyecto</th><th>Rol</th><th>Inicio</th><th>Estado</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in asignaciones %}
+        <tr>
+          <td>{{ a.tecnico }}<small>{{ a.especialidad or '' }}</small></td>
+          <td>{{ a.proyecto }}<small>{{ a.cliente or '' }}{% if a.ubicacion %} · {{ a.ubicacion }}{% endif %}</small></td>
+          <td>{{ a.rol or '—' }}</td>
+          <td>{{ a.fecha_inicio }}{% if a.fecha_fin %}<small>fin {{ a.fecha_fin }}</small>{% endif %}</td>
+          <td><span class="estado {{ a.estado }}">{{ a.estado }}</span></td>
+          <td>
+            <div class="acciones">
+              {% for e in estados if e != a.estado %}
+              <form method="post" action="/asignaciones/{{ a.id }}/estado">
+                <input type="hidden" name="estado" value="{{ e }}">
+                <input type="hidden" name="filtro" value="{{ filtro }}">
+                <button class="secundario" type="submit">{{ e }}</button>
+              </form>
+              {% endfor %}
+              <form method="post" action="/asignaciones/{{ a.id }}/eliminar">
+                <button class="secundario" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="vacio">Todavía no hay asignaciones con este filtro. Registra técnicos y proyectos, y luego asigna a alguien desde el formulario de la izquierda.</p>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,23 @@
+services:
+  registro:
+    build: .
+    image: registro-tecnicos:latest
+    container_name: registro-tecnicos
+    ports:
+      - "8000:8000"
+    volumes:
+      - registro-datos:/data
+    environment:
+      DB_PATH: /data/registro.db
+      PORT: 8000
+      # Token que usará n8n. Cámbialo por uno largo y aleatorio.
+      API_TOKEN: ${API_TOKEN:-cambia-este-token}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  registro-datos:
